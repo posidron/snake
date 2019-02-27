@@ -6,18 +6,32 @@ env:
     - CRATE_NAME=snake
 matrix:
   include:
-    - env: TARGET=x86_64-unknown-linux-gnu
-    - env: TARGET=x86_64-apple-darwin
+    - env:
+        - TARGET=x86_64-unknown-linux-gnu
+        - PACKAGE=$CRATE_NAME-x86_64-linux.tar.gz
+      os: linux
+    - env:
+        - TARGET=x86_64-apple-darwin
+        - PACKAGE=$CRATE_NAME-x86_64-darwin.tar.gz
       os: osx
-    - env: TARGET=x86_64-pc-windows-gnu
+    - env:
+        - TARGET=x86_64-pc-windows-gnu
+        - PACKAGE=$CRATE_NAME-x86_64-windows.tar.gz
+      os: windows
 cache: cargo
+before_install:
+  - set -e
+  - rustup component add rustfmt
 script:
-  - cargo build
+  - cargo test
+  - cargo build --target $TARGET --verbose --release
+before_deploy:
+  - tar -czf $PACKAGE -C target/$TARGET/release/ $NAME
 deploy:
   api_key:
     secure: "PE3/HQGlTW/MYRBdbWR10xvuUKZ1XSTyHNHtOGLNumRsUWT4zRLYRpo6sl110ENCy6xF4CUkg3gJxSfoCH96MWV8h80z5xvICVL/Rv58+ut1dBtejXoRLMx6AJeBV4xjpKDilLxfnBc7w4bqQRbP64XtFCQF8a8wwdGGtG8v7iLdugEVoHheAPUC1rXB1almvpsKaI38mDe7eYqp5q+xZ8MyiKKaY11Hghq5aZUvONlMeXrakmqs5jNaLed48x4UKpZD/1LyDkodOa+fqd7oZ4j0QjuGIcZ34BHFk9z/8zvWRS4Lk7Tc+oNUO880igAVz0PvX3TPFjK8slhYF5eha8N8gDudNxAAeFtd7snU7gF6Q2MKdf13MeXmcroZUrPN7KkOPTZT7tsVTmoHsQ4tGZ3a72yoQLk6xsjQo0ZUm8DvzbWIup7Mv456Gri/QeZzHYOOSH2kusgw7XjQbaNkZsmPy9uY7Ht82QZ9oTIWhZNepBzfyYT/BB7pnIK1f2A4FhGalBJLfHs/b7g0mpLI3TPESfzxgnvGn9phD/6qqohXFOJ4/lk5uwUxqbbAaMASOarGuUGwL3KAMY3VDB9RnmDSzVLCK3IJY3Yb5ORIfK37B/3w+WXg15Y1NlYTI1hAn75hRrJHE4HPcAB/FLagi1Rmmp2PzU45RpN+2Hbd32o="
   file_glob: true
-  file: $CRATE_NAME-$TRAVIS_TAG-$TARGET.*
+  file: $PACKAGE
   on:
     condition: $TRAVIS_RUST_VERSION = stable
     tags: true
