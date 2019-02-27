@@ -1,0 +1,5 @@
+lanugage: rust
+rust:
+  - stable
+script:
+  - cargo build
