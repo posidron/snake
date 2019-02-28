@@ -15,7 +15,7 @@ matrix:
         - PACKAGE=$CRATE_NAME-x86_64-darwin.tar.gz
       os: osx
     - env:
-        - TARGET=x86_64-pc-windows-gnu
+        - TARGET=x86_64-pc-windows-msvc
         - PACKAGE=$CRATE_NAME-x86_64-windows.tar.gz
       os: windows
 cache: cargo
